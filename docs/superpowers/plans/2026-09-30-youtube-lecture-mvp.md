@@ -14,7 +14,7 @@
 
 - 플러그인 식별자는 `youtube-lecture`; 경로는 `plugins/youtube-lecture/`이다.
 - 공개 유튜브 영상 하나씩 처리한다. 자막 확보 실패 시 중단하며 음성 전사는 하지 않는다.
-- 자막 전문·목차·요약·용어집의 표시 언어는 한국어이다. 외국어 자막을 번역한 경우 표시한다.
+- 자막 전문·목차·요약·용어집의 표시 언어는 한국어이다. 명백한 오전사만 교정하고 불확실한 고유명사·수치는 원문을 유지한다. 외국어 자막을 번역한 경우 표시한다.
 - 한 JSON에 `schema_version`, `video`, `transcript`, `outline`, `summary`, `glossary`를 넣고 시점은 밀리초로 저장한다.
 - 설치자는 서비스 계정이나 API 키가 필요 없다. 서버에 공통 업로드 비밀 키를 플러그인에 넣지 않는다.
 - 업로드 본문 상한은 4 MiB, 동일 IP 한도는 24시간 5건, 전체 한도는 24시간 100건이다.
@@ -75,7 +75,7 @@
 
 **Files:** Create `plugins/youtube-lecture/.codex-plugin/plugin.json`, `plugins/youtube-lecture/skills/lecture-notes/SKILL.md`, `plugins/youtube-lecture/scripts/validate_and_upload.py`, `.agents/plugins/marketplace.json`, `tests/test_plugin_upload.py`.
 
-**Interfaces:** Produces `upload_lecture(payload_path: Path, base_url: str) -> str`; returns server-supplied share URL only after 201 response. The skill has Codex process caption batches in time order, preserve source times, translate non-Korean captions, create overview/section notes/2-level outline/glossary, call local validator, then upload once. Validated JSON remains in a local output directory on upload failure.
+**Interfaces:** Produces `upload_lecture(payload_path: Path, base_url: str) -> str`; returns server-supplied share URL only after 201 response. The skill has Codex process caption batches in time order, keep `source_text` unchanged, repair only clear transcription errors in `ko_text`, preserve uncertain names and numbers, translate non-Korean captions, create overview/section notes/2-level outline/glossary, call local validator, then upload once. Validated JSON remains in a local output directory on upload failure.
 
 - [ ] Write tests with a fake HTTP server for valid upload, local validation failure without network request, 429 and 5xx with preserved JSON, and returned share URL verification.
 - [ ] Run focused tests and confirm failure.
@@ -113,7 +113,7 @@
 - [ ] Document one-command marketplace addition, plugin installation, accepted YouTube URLs, Codex desktop/runtime prerequisites, expected failures, Railway setup, limits, and explicit public-by-link transcript behavior.
 - [ ] Run `uv run pytest -q`, plugin and marketplace validation, and a local server upload/page smoke test; record observed results.
 - [ ] Authenticate `gh` and `railway` only through their normal login flows, then create/connect the intended GitHub repository and Railway project when access is available. Deploy PostgreSQL and server, set Railway root/build configuration and environment values, then record public URL in plugin config.
-- [ ] Test one accessible public lecture end to end from a freshly installed repo-marketplace plugin; inspect the returned share page. Publish the GitHub repo and give the install command to the user.
+- [ ] Test one accessible public lecture end to end from a freshly installed repo-marketplace plugin; inspect the returned share page. Check a fixed noisy-caption sample for repetition repair, clear transcription correction, preserved uncertain terms, and unchanged `source_text`. Publish the GitHub repo and give the install command to the user.
 
 ## External access currently needed for Task 6
 
