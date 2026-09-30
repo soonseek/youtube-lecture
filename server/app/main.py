@@ -58,6 +58,11 @@ def create_app(store=None) -> FastAPI:
 
     @application.get("/health")
     def health() -> dict:
+        try:
+            current_store().check_ready()
+        except Exception as error:
+            logger.exception("Lecture storage health check failed")
+            raise HTTPException(503, "저장소에 연결할 수 없습니다") from error
         return {"status": "ok"}
 
     @application.post("/api/lectures")

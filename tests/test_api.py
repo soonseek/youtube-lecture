@@ -37,6 +37,9 @@ class FakeStore:
     def get(self, share_id):
         return self.saved.get(share_id)
 
+    def check_ready(self):
+        return None
+
 
 def client(store=None):
     store = store or FakeStore()
@@ -51,6 +54,16 @@ def test_upload_and_read_roundtrip():
     assert response.json() == {"share_id": "shared0001", "share_url": "http://testserver/lectures/shared0001"}
     assert api.get("/api/lectures/shared0001").json() == payload()
     assert store.clients == ["testclient"]
+
+
+def test_uploaded_result_is_rendered_at_share_url():
+    api, _ = client()
+    result = api.post("/api/lectures", json=payload()).json()
+    page = api.get(result["share_url"])
+    assert page.status_code == 200
+    assert "전체 요약" in page.text
+    assert "자막 전문" in page.text
+    assert "내용" in page.text
 
 
 def test_invalid_json_and_unknown_id():
@@ -94,3 +107,12 @@ def test_global_limit_after_one_hundred_uploads():
 def test_health():
     api, _ = client()
     assert api.get("/health").json() == {"status": "ok"}
+
+
+def test_health_reports_storage_failure():
+    class BrokenStore(FakeStore):
+        def check_ready(self):
+            raise RuntimeError("database unavailable")
+
+    api, _ = client(BrokenStore())
+    assert api.get("/health").status_code == 503

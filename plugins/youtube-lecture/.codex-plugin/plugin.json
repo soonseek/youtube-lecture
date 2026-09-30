@@ -1,16 +1,24 @@
 {
   "name": "youtube-lecture",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260930093016",
   "description": "Turn public YouTube lectures into Korean study notes and shareable pages.",
-  "author": {"name": "YouTube Lecture Contributors"},
+  "author": {
+    "name": "YouTube Lecture Contributors"
+  },
   "skills": "./skills/",
   "interface": {
     "displayName": "YouTube Lecture",
-    "shortDescription": "유튜브 강의를 한국어 학습 자료로 정리",
-    "longDescription": "공개 유튜브 강의의 자막을 읽고 교정해 한국어 목차, 요약 노트, 용어집, 자막 전문을 만들고 공유 페이지에 저장합니다.",
+    "shortDescription": "\uc720\ud29c\ube0c \uac15\uc758\ub97c \ud55c\uad6d\uc5b4 \ud559\uc2b5 \uc790\ub8cc\ub85c \uc815\ub9ac",
+    "longDescription": "\uacf5\uac1c \uc720\ud29c\ube0c \uac15\uc758\uc758 \uc790\ub9c9\uc744 \uc77d\uace0 \uad50\uc815\ud574 \ud55c\uad6d\uc5b4 \ubaa9\ucc28, \uc694\uc57d \ub178\ud2b8, \uc6a9\uc5b4\uc9d1, \uc790\ub9c9 \uc804\ubb38\uc744 \ub9cc\ub4e4\uace0 \uacf5\uc720 \ud398\uc774\uc9c0\uc5d0 \uc800\uc7a5\ud569\ub2c8\ub2e4.",
     "developerName": "YouTube Lecture Contributors",
     "category": "Productivity",
-    "capabilities": ["Read public captions", "Create study notes", "Share results"],
-    "defaultPrompt": ["이 유튜브 강의를 목차·요약·용어집으로 정리해 줘: <링크>"]
+    "capabilities": [
+      "Read public captions",
+      "Create study notes",
+      "Share results"
+    ],
+    "defaultPrompt": [
+      "\uc774 \uc720\ud29c\ube0c \uac15\uc758\ub97c \ubaa9\ucc28\u00b7\uc694\uc57d\u00b7\uc6a9\uc5b4\uc9d1\uc73c\ub85c \uc815\ub9ac\ud574 \uc918: <\ub9c1\ud06c>"
+    ]
   }
 }

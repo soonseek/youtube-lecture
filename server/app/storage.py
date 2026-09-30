@@ -57,6 +57,11 @@ class PostgresLectureStore:
                 conn.execute("CREATE INDEX IF NOT EXISTS upload_events_ip_hash_idx ON upload_events (ip_hash, created_at)")
             self._schema_ready = True
 
+    def check_ready(self) -> None:
+        self._ensure_schema()
+        with self._connect() as conn:
+            conn.execute("SELECT 1")
+
     def create(self, payload: dict, client_ip: str) -> str:
         self._ensure_schema()
         ip_hash = hmac.new(self.rate_limit_salt, client_ip.encode("utf-8"), hashlib.sha256).hexdigest()
