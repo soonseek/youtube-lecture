@@ -75,7 +75,7 @@
 
 **Files:** Create `plugins/youtube-lecture/.codex-plugin/plugin.json`, `plugins/youtube-lecture/skills/lecture-notes/SKILL.md`, `plugins/youtube-lecture/scripts/validate_and_upload.py`, `.agents/plugins/marketplace.json`, `tests/test_plugin_upload.py`.
 
-**Interfaces:** Produces `upload_lecture(payload_path: Path, base_url: str) -> str`; returns server-supplied share URL only after 201 response. The skill has Codex process caption batches in time order, keep `source_text` unchanged, repair only clear transcription errors in `ko_text`, preserve uncertain names and numbers, translate non-Korean captions, create overview/section notes/2-level outline/glossary, call local validator, then upload once. Validated JSON remains in a local output directory on upload failure.
+**Interfaces:** Produces `upload_lecture(payload_path: Path, base_url: str) -> str`; returns server-supplied share URL only after 201 response. The skill first reads all caption batches and merges context notes about subject, flow, repeated terms, and names. It then revisits batches to write `ko_text`, using later clear occurrences to repair likely transcription errors while keeping `source_text` unchanged and preserving uncertain names/numbers. After that it creates overview/section notes/2-level outline/glossary, calls local validator, and uploads once. Validated JSON remains in a local output directory on upload failure.
 
 - [ ] Write tests with a fake HTTP server for valid upload, local validation failure without network request, 429 and 5xx with preserved JSON, and returned share URL verification.
 - [ ] Run focused tests and confirm failure.
@@ -113,7 +113,7 @@
 - [ ] Document one-command marketplace addition, plugin installation, accepted YouTube URLs, Codex desktop/runtime prerequisites, expected failures, Railway setup, limits, and explicit public-by-link transcript behavior.
 - [ ] Run `uv run pytest -q`, plugin and marketplace validation, and a local server upload/page smoke test; record observed results.
 - [ ] Authenticate `gh` and `railway` only through their normal login flows, then create/connect the intended GitHub repository and Railway project when access is available. Deploy PostgreSQL and server, set Railway root/build configuration and environment values, then record public URL in plugin config.
-- [ ] Test one accessible public lecture end to end from a freshly installed repo-marketplace plugin; inspect the returned share page. Check a fixed noisy-caption sample for repetition repair, clear transcription correction, preserved uncertain terms, and unchanged `source_text`. Publish the GitHub repo and give the install command to the user.
+- [ ] Test one accessible public lecture end to end from a freshly installed repo-marketplace plugin; inspect the returned share page. Use a fixed noisy-caption sample where a term is misrecognized early and correctly spoken later: verify the first-pass context memo precedes correction, the earlier term is corrected using later evidence, uncertain terms remain untouched, and `source_text` stays unchanged. Publish the GitHub repo and give the install command to the user.
 
 ## External access currently needed for Task 6
 
