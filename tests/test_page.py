@@ -62,3 +62,13 @@ def test_user_text_is_escaped_not_executed():
 def test_unknown_page_returns_404():
     response = TestClient(create_app(store=Store(lecture()))).get("/lectures/missing")
     assert response.status_code == 404
+
+
+def test_static_assets_use_same_origin_paths_behind_https_proxy():
+    client = TestClient(create_app(store=Store(lecture())), base_url="http://testserver")
+    lecture_response = client.get("/lectures/shared123", headers={"x-forwarded-proto": "https"})
+    missing_response = client.get("/lectures/missing", headers={"x-forwarded-proto": "https"})
+
+    assert 'href="/static/lecture.css"' in lecture_response.text
+    assert 'src="/static/lecture.js"' in lecture_response.text
+    assert 'href="/static/lecture.css"' in missing_response.text
