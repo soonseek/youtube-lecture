@@ -73,4 +73,4 @@ codex plugin add youtube-lecture@youtube-lecture-tools
 
 ## 현재 상태
 
-로컬 코드와 테스트를 마쳤고 GitHub 저장소와 Railway 서버를 게시했습니다. 실제 강의 한 건의 전체 생성·업로드 결과는 마지막 검증 단계에서 확인합니다.
+로컬 코드와 테스트를 마쳤고 GitHub 저장소와 Railway 서버를 게시했습니다. 공개 영상 [Python in 100 Seconds](https://www.youtube.com/watch?v=x7X9w_GIm1s)의 자막 72개를 수집해 전체 맥락 메모, 한국어 자막, 목차, 노트, 용어집을 만든 뒤 업로드했습니다. [실제 공유 페이지](https://youtube-lecture-web-production.up.railway.app/lectures/J4e7x6IEQED3a5CLn3ksDd9diyQLc1X-)에서 결과를 확인할 수 있습니다.
