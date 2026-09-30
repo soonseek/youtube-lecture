@@ -6,10 +6,10 @@
 
 ## 지인에게 배포하기
 
-GitHub 저장소와 Railway 주소가 준비되면 다음 두 명령으로 플러그인을 설치할 수 있습니다. `<소유자>/<저장소>`는 실제 공개 GitHub 저장소로 바꾸세요.
+공개 저장소는 [soonseek/youtube-lecture](https://github.com/soonseek/youtube-lecture)입니다. Railway 주소가 준비되면 다음 두 명령으로 플러그인을 설치할 수 있습니다.
 
 ```powershell
-codex plugin marketplace add <소유자>/<저장소> --ref main
+codex plugin marketplace add soonseek/youtube-lecture --ref main
 codex plugin add youtube-lecture@youtube-lecture-tools
 ```
 
@@ -73,4 +73,4 @@ codex plugin add youtube-lecture@youtube-lecture-tools
 
 ## 현재 상태
 
-로컬 코드와 테스트는 준비되었습니다. GitHub 게시와 Railway 배포에는 운영자의 계정 로그인과 프로젝트 연결이 필요합니다. 배포 주소가 정해질 때까지 플러그인은 `YOUTUBE_LECTURE_SERVER_URL`을 요구합니다.
+로컬 코드와 테스트를 마쳤고 GitHub 저장소를 게시했습니다. Railway 배포 주소가 정해질 때까지 플러그인은 `YOUTUBE_LECTURE_SERVER_URL`을 요구합니다.
