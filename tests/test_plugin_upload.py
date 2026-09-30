@@ -97,3 +97,15 @@ def test_upload_failure_preserves_json_and_reports_status(tmp_path, status):
     assert str(status) in str(error.value)
     assert len(received) == 1
     assert path.exists()
+
+
+def test_cli_uses_deployed_server_without_user_configuration(tmp_path, monkeypatch, capsys):
+    path = write_payload(tmp_path, valid_payload())
+    used = []
+    monkeypatch.delenv("YOUTUBE_LECTURE_SERVER_URL", raising=False)
+    monkeypatch.setattr(sys, "argv", ["validate_and_upload.py", str(path)])
+    monkeypatch.setattr(module, "upload_lecture", lambda payload, base: used.append((payload, base)) or base + "/lectures/demo")
+
+    assert module.main() == 0
+    assert used == [(path, "https://youtube-lecture-web-production.up.railway.app")]
+    assert capsys.readouterr().out.strip().endswith("/lectures/demo")

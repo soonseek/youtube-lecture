@@ -6,7 +6,7 @@
 
 ## 지인에게 배포하기
 
-공개 저장소는 [soonseek/youtube-lecture](https://github.com/soonseek/youtube-lecture)입니다. Railway 주소가 준비되면 다음 두 명령으로 플러그인을 설치할 수 있습니다.
+공개 저장소는 [soonseek/youtube-lecture](https://github.com/soonseek/youtube-lecture)입니다. 다음 두 명령으로 플러그인을 설치할 수 있습니다.
 
 ```powershell
 codex plugin marketplace add soonseek/youtube-lecture --ref main
@@ -15,7 +15,7 @@ codex plugin add youtube-lecture@youtube-lecture-tools
 
 Codex에서 “이 유튜브 강의를 목차·요약·용어집으로 정리해 줘: https://www.youtube.com/watch?v=...”처럼 요청합니다. `https://youtu.be/...`, `youtube.com/live/...`, `youtube.com/shorts/...` 링크도 받습니다. 영상 하나씩 처리합니다.
 
-현재 배포 전 버전은 서버 URL을 환경 변수로 받습니다. Railway 도메인을 확정한 다음 `YOUTUBE_LECTURE_SERVER_URL`의 기본값을 플러그인에 넣어 재배포하면 설치자는 링크만 입력하면 됩니다.
+공유 서버 기본 주소는 `https://youtube-lecture-web-production.up.railway.app`입니다. 다른 서버를 시험할 때만 `YOUTUBE_LECTURE_SERVER_URL`로 바꿀 수 있습니다.
 
 ```powershell
 $env:YOUTUBE_LECTURE_SERVER_URL = 'https://<Railway-도메인>'
@@ -63,8 +63,8 @@ codex plugin add youtube-lecture@youtube-lecture-tools
 1. 이 저장소를 GitHub에 올리고 Railway 프로젝트에 **저장소 루트**를 소스로 하는 웹 서비스를 만듭니다. 루트의 `Dockerfile`이 서버와 플러그인의 JSON Schema를 함께 복사합니다.
 2. 같은 프로젝트에 PostgreSQL을 추가합니다. 웹 서비스의 `DATABASE_URL`을 PostgreSQL 서비스의 `DATABASE_URL` 참조 변수로 연결합니다(예: `${{Postgres.DATABASE_URL}}`; 실제 서비스 이름에 맞게 변경).
 3. 웹 서비스 변수 `RATE_LIMIT_SALT`에 충분히 긴 임의 문자열을 설정합니다. 이 값은 서버에서 IP를 해시할 때만 사용하고 Git이나 플러그인에 넣지 않습니다. `TRUST_RAILWAY_PROXY=1`을 설정합니다.
-4. 웹 서비스의 공개 HTTPS 도메인을 생성하고 `PUBLIC_BASE_URL=https://<도메인>`으로 설정합니다. `https://<도메인>/health`가 `{"status":"ok"}`를 반환하는지 확인합니다. 이 상태 확인은 데이터베이스 연결도 점검합니다.
-5. 확정한 HTTPS 도메인을 `plugins/youtube-lecture/scripts/validate_and_upload.py`의 기본 서버 URL에 반영하고 다시 GitHub에 올립니다. 새 설치에서는 환경 변수 입력이 필요 없어집니다.
+4. 웹 서비스의 공개 HTTPS 도메인을 생성하고 `PUBLIC_BASE_URL=https://<도메인>`으로 설정합니다. 서비스 설정에서 Healthcheck Path를 `/health`로 지정합니다. `https://<도메인>/health`가 `{"status":"ok"}`를 반환하는지 확인합니다. 이 상태 확인은 데이터베이스 연결도 점검합니다.
+5. 공개 HTTPS 도메인이 바뀌면 `plugins/youtube-lecture/scripts/validate_and_upload.py`의 기본 서버 URL을 갱신해 GitHub에 올립니다.
 6. 실제 공개 강의 하나로 설치→자막 수집→JSON 생성→업로드→공유 페이지를 확인합니다. 공개 페이지에서 목차 시점 이동, 자막 검색, 모바일 표시와 번역 표기를 확인합니다.
 
 필수 서버 변수: `DATABASE_URL`, `RATE_LIMIT_SALT`, `PUBLIC_BASE_URL`, `TRUST_RAILWAY_PROXY=1`. 값이 없거나 데이터베이스를 사용할 수 없으면 `/health`가 503을 반환합니다. PostgreSQL 테이블은 첫 연결 때 생성됩니다.
@@ -73,4 +73,4 @@ codex plugin add youtube-lecture@youtube-lecture-tools
 
 ## 현재 상태
 
-로컬 코드와 테스트를 마쳤고 GitHub 저장소를 게시했습니다. Railway 배포 주소가 정해질 때까지 플러그인은 `YOUTUBE_LECTURE_SERVER_URL`을 요구합니다.
+로컬 코드와 테스트를 마쳤고 GitHub 저장소와 Railway 서버를 게시했습니다. 실제 강의 한 건의 전체 생성·업로드 결과는 마지막 검증 단계에서 확인합니다.

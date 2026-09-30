@@ -13,6 +13,7 @@ from contract import validate_lecture
 
 
 MAX_BODY_BYTES = 4 * 1024 * 1024
+DEFAULT_SERVER_URL = "https://youtube-lecture-web-production.up.railway.app"
 
 
 class UploadError(RuntimeError):
@@ -68,7 +69,7 @@ def upload_lecture(payload_path: Path, base_url: str) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description="강의 JSON을 검증하고 공유 서버에 업로드합니다")
     parser.add_argument("payload", type=Path)
-    parser.add_argument("--server-url", default=os.getenv("YOUTUBE_LECTURE_SERVER_URL", ""))
+    parser.add_argument("--server-url", default=os.getenv("YOUTUBE_LECTURE_SERVER_URL") or DEFAULT_SERVER_URL)
     args = parser.parse_args()
     if not args.server_url:
         print("서버 URL이 설정되지 않았습니다. YOUTUBE_LECTURE_SERVER_URL을 설정해 주세요", file=sys.stderr)
