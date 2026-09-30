@@ -3,6 +3,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from requests.exceptions import ConnectionError as RequestConnectionError
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "plugins/youtube-lecture/scripts/fetch_transcript.py"
@@ -109,6 +110,18 @@ def test_no_caption_track_stops_processing(monkeypatch):
     with pytest.raises(module.TranscriptUnavailable) as error:
         module.fetch_transcript("abcdefghijk")
     assert error.value.code == "no_captions"
+
+
+def test_network_failure_has_short_user_message(monkeypatch):
+    class OfflineApi:
+        def list(self, video_id):
+            raise RequestConnectionError("network blocked")
+
+    monkeypatch.setattr(module, "YouTubeTranscriptApi", OfflineApi)
+    with pytest.raises(module.TranscriptUnavailable) as error:
+        module.fetch_transcript("abcdefghijk")
+    assert error.value.code == "network"
+    assert "연결" in str(error.value)
 
 
 def test_split_batches_keeps_order_and_every_snippet():

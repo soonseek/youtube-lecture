@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
+from requests.exceptions import RequestException
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api._errors import (
     AgeRestricted,
@@ -90,6 +91,8 @@ def fetch_transcript(video_id: str, preferred_languages: tuple[str, ...] = ("ko"
         raise TranscriptUnavailable("blocked", "유튜브가 현재 자막 요청을 차단했습니다") from error
     except VideoUnavailable as error:
         raise TranscriptUnavailable("unavailable", "이 영상을 사용할 수 없습니다") from error
+    except RequestException as error:
+        raise TranscriptUnavailable("network", "유튜브에 연결하지 못했습니다. 네트워크 상태를 확인해 주세요") from error
     except YouTubeTranscriptApiException as error:
         raise TranscriptUnavailable("fetch_failed", "자막을 가져오지 못했습니다") from error
 
