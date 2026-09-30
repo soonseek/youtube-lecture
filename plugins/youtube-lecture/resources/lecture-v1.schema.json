@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "YouTube Lecture Result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "video", "transcript", "outline", "summary", "glossary"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "video": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["youtube_id", "url", "title", "source_language", "transcript_language", "is_translated", "processed_at"],
+      "properties": {
+        "youtube_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{11}$"},
+        "url": {"type": "string", "format": "uri", "pattern": "^https://"},
+        "title": {"$ref": "#/$defs/text"},
+        "source_language": {"type": "string", "pattern": "^[a-z]{2,3}(?:-[A-Za-z]{2,4})?$"},
+        "transcript_language": {"const": "ko"},
+        "is_translated": {"type": "boolean"},
+        "processed_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "transcript": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["start_ms", "duration_ms", "source_text", "ko_text"],
+        "properties": {
+          "start_ms": {"$ref": "#/$defs/time"},
+          "duration_ms": {"type": "integer", "minimum": 1},
+          "source_text": {"$ref": "#/$defs/text"},
+          "ko_text": {"$ref": "#/$defs/text"}
+        }
+      }
+    },
+    "outline": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["title", "start_ms", "children"],
+        "properties": {
+          "title": {"$ref": "#/$defs/text"},
+          "start_ms": {"$ref": "#/$defs/time"},
+          "children": {
+            "type": "array", "minItems": 1,
+            "items": {
+              "type": "object", "additionalProperties": false,
+              "required": ["title", "start_ms"],
+              "properties": {
+                "title": {"$ref": "#/$defs/text"},
+                "start_ms": {"$ref": "#/$defs/time"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["overview", "sections"],
+      "properties": {
+        "overview": {"$ref": "#/$defs/text"},
+        "sections": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["heading", "body", "source_start_ms"],
+            "properties": {
+              "heading": {"$ref": "#/$defs/text"},
+              "body": {"$ref": "#/$defs/text"},
+              "source_start_ms": {"$ref": "#/$defs/time"}
+            }
+          }
+        }
+      }
+    },
+    "glossary": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["term", "definition", "source_start_ms"],
+        "properties": {
+          "term": {"$ref": "#/$defs/text"},
+          "definition": {"$ref": "#/$defs/text"},
+          "source_start_ms": {"$ref": "#/$defs/time"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "text": {"type": "string", "pattern": "\\S"},
+    "time": {"type": "integer", "minimum": 0}
+  }
+}

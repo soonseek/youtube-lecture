@@ -1,0 +1,16 @@
+[project]
+name = "youtube-lecture-server"
+version = "0.1.0"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+  "jsonschema>=4.23,<5",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3,<9",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
