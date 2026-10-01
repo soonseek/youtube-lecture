@@ -72,3 +72,17 @@ def test_static_assets_use_same_origin_paths_behind_https_proxy():
     assert 'href="/static/lecture.css"' in lecture_response.text
     assert 'src="/static/lecture.js"' in lecture_response.text
     assert 'href="/static/lecture.css"' in missing_response.text
+
+
+def test_detail_places_video_and_scrollable_transcript_before_tabbed_notes():
+    response = TestClient(create_app(store=Store(lecture()))).get("/lectures/shared123")
+    html = response.text
+    assert html.index('id="watch-column"') < html.index('id="lecture-player"')
+    assert html.index('id="lecture-player"') < html.index('id="transcript"')
+    assert html.index('id="transcript"') < html.index('id="study-tabs"')
+    assert 'role="tablist"' in html
+    assert 'role="tab"' in html
+    assert 'role="tabpanel"' in html
+    assert 'aria-controls="panel-outline"' in html
+    assert 'aria-controls="panel-notes"' in html
+    assert 'aria-controls="panel-glossary"' in html

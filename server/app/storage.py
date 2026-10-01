@@ -55,6 +55,7 @@ class PostgresLectureStore:
                 """)
                 conn.execute("CREATE INDEX IF NOT EXISTS upload_events_created_at_idx ON upload_events (created_at)")
                 conn.execute("CREATE INDEX IF NOT EXISTS upload_events_ip_hash_idx ON upload_events (ip_hash, created_at)")
+                conn.execute("CREATE INDEX IF NOT EXISTS lectures_created_at_idx ON lectures (created_at DESC, share_id DESC)")
             self._schema_ready = True
 
     def check_ready(self) -> None:
@@ -87,3 +88,21 @@ class PostgresLectureStore:
         with self._connect() as conn:
             row = conn.execute("SELECT payload FROM lectures WHERE share_id = %s", (share_id,)).fetchone()
         return row[0] if row else None
+
+    def list_page(self, page: int, page_size: int = 24) -> tuple[list[dict], bool]:
+        self._ensure_schema()
+        with self._connect() as conn:
+            rows = conn.execute("""
+                SELECT share_id, payload->'video'->>'youtube_id',
+                       payload->'video'->>'title', payload->'video'->>'source_language',
+                       payload->'video'->>'processed_at', jsonb_array_length(payload->'outline')
+                FROM lectures
+                ORDER BY created_at DESC, share_id DESC
+                LIMIT %s OFFSET %s
+            """, (page_size + 1, (page - 1) * page_size)).fetchall()
+        items = [
+            {"share_id": row[0], "youtube_id": row[1], "title": row[2],
+             "source_language": row[3], "processed_at": row[4], "topic_count": row[5]}
+            for row in rows[:page_size]
+        ]
+        return items, len(rows) > page_size

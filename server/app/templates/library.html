@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>강의 목록 · YouTube Lecture</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='lecture.css').path }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="wordmark" href="/" aria-label="YouTube Lecture 강의 목록"><span class="brand-mark"><span></span></span><span>youtube<span class="brand-divider">/</span>lecture</span></a>
+      <span class="header-label">LECTURE LIBRARY</span>
+    </div>
+  </header>
+  <main class="page-shell library-page">
+    <div class="library-heading">
+      <div class="eyebrow"><span class="eyebrow-line"></span> 강의 학습 자료</div>
+      <h1>정리된 강의</h1>
+      <p>영상을 선택하면 목차와 요약, 용어집, 한국어 자막을 함께 볼 수 있습니다.</p>
+    </div>
+    {% if lectures %}
+    <div class="lecture-grid">
+      {% for item in lectures %}
+      <a class="lecture-card" href="/lectures/{{ item.share_id }}" aria-label="{{ item.title }} 강의 보기">
+        <div class="lecture-thumb">
+          <img src="https://i.ytimg.com/vi/{{ item.youtube_id }}/hqdefault.jpg" alt="" loading="lazy">
+          <span class="thumb-play" aria-hidden="true">▶</span>
+        </div>
+        <div class="lecture-card-body">
+          <div class="lecture-card-meta"><span>{{ item.processed_at[:10] }} 정리</span><span>원문 {{ item.source_language|upper }}</span></div>
+          <h2>{{ item.title }}</h2>
+          <div class="lecture-card-foot"><span>{{ item.topic_count }}개 주요 목차</span><span aria-hidden="true">↗</span></div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    <nav class="library-pagination" aria-label="강의 목록 페이지">
+      {% if page > 1 %}<a href="/?page={{ page - 1 }}">← 이전</a>{% endif %}
+      <span>{{ page }} 페이지</span>
+      {% if has_next %}<a href="/?page={{ page + 1 }}">다음 →</a>{% endif %}
+    </nav>
+    {% else %}
+    <section class="library-empty">
+      <div class="empty-symbol" aria-hidden="true">▶</div>
+      <h2>아직 정리된 강의가 없습니다</h2>
+      <p>Codex에서 공개 유튜브 강의 링크를 youtube-lecture 플러그인에 전달하면 이곳에 결과가 나타납니다.</p>
+      {% if page > 1 %}<a class="empty-back" href="/?page={{ page - 1 }}">← 이전 페이지로 돌아가기</a>{% endif %}
+    </section>
+    {% endif %}
+  </main>
+  <footer class="site-footer"><span>youtube<span class="brand-divider">/</span>lecture</span><span>강의 자막을 바탕으로 생성한 학습 자료입니다.</span></footer>
+</body>
+</html>

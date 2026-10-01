@@ -6,7 +6,7 @@ import logging
 import os
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -64,6 +64,18 @@ def create_app(store=None) -> FastAPI:
             logger.exception("Lecture storage health check failed")
             raise HTTPException(503, "저장소에 연결할 수 없습니다") from error
         return {"status": "ok"}
+
+    @application.get("/")
+    def library_page(request: Request, page: int = Query(default=1, ge=1)):
+        try:
+            lectures, has_next = current_store().list_page(page)
+        except Exception as error:
+            logger.exception("Lecture list failed")
+            raise HTTPException(503, "강의 목록을 읽지 못했습니다") from error
+        return templates.TemplateResponse(
+            request, "library.html", {"lectures": lectures, "page": page, "has_next": has_next},
+            headers={"X-Robots-Tag": "noindex, nofollow"},
+        )
 
     @application.post("/api/lectures")
     async def create_lecture(request: Request):

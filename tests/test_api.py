@@ -40,6 +40,16 @@ class FakeStore:
     def check_ready(self):
         return None
 
+    def list_page(self, page, page_size=24):
+        entries = [
+            {"share_id": share_id, "youtube_id": item["video"]["youtube_id"],
+             "title": item["video"]["title"], "source_language": item["video"]["source_language"],
+             "processed_at": item["video"]["processed_at"], "topic_count": len(item["outline"])}
+            for share_id, item in reversed(list(self.saved.items()))
+        ]
+        start = (page - 1) * page_size
+        return entries[start:start + page_size], len(entries) > start + page_size
+
 
 def client(store=None):
     store = store or FakeStore()
@@ -116,3 +126,51 @@ def test_health_reports_storage_failure():
 
     api, _ = client(BrokenStore())
     assert api.get("/health").status_code == 503
+
+
+def test_home_lists_saved_lectures_without_full_transcripts():
+    api, store = client()
+    first = payload()
+    first["video"]["title"] = "첫 강의"
+    second = payload()
+    second["video"]["title"] = "두 번째 강의"
+    store.create(first, "testclient")
+    store.create(second, "testclient")
+
+    response = api.get("/")
+
+    assert response.status_code == 200
+    assert response.headers["x-robots-tag"] == "noindex, nofollow"
+    assert response.text.index("두 번째 강의") < response.text.index("첫 강의")
+    assert 'href="/lectures/shared0002"' in response.text
+    assert 'href="/lectures/shared0001"' in response.text
+    assert "전체 요약" not in response.text
+    assert "내용" not in response.text
+
+
+def test_home_empty_and_next_page():
+    api, store = client()
+    assert "아직 정리된 강의가 없습니다" in api.get("/").text
+    for number in range(25):
+        item = payload()
+        item["video"]["title"] = f"강의 {number}"
+        store.create(item, f"visitor-{number}")
+    first_page = api.get("/")
+    second_page = api.get("/?page=2")
+    assert 'href="/?page=2"' in first_page.text
+    assert "강의 24" in first_page.text
+    assert "강의 0" not in first_page.text
+    assert "강의 0" in second_page.text
+    assert 'href="/?page=1"' in second_page.text
+    assert 'href="/?page=2"' in api.get("/?page=3").text
+    assert api.get("/?page=0").status_code == 422
+
+
+def test_home_escapes_uploaded_title():
+    api, store = client()
+    item = payload()
+    item["video"]["title"] = '<script>alert("x")</script>'
+    store.create(item, "testclient")
+    response = api.get("/")
+    assert "&lt;script&gt;" in response.text
+    assert '<script>alert("x")</script>' not in response.text
