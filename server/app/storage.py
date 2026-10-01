@@ -56,6 +56,10 @@ class PostgresLectureStore:
                 conn.execute("CREATE INDEX IF NOT EXISTS upload_events_created_at_idx ON upload_events (created_at)")
                 conn.execute("CREATE INDEX IF NOT EXISTS upload_events_ip_hash_idx ON upload_events (ip_hash, created_at)")
                 conn.execute("CREATE INDEX IF NOT EXISTS lectures_created_at_idx ON lectures (created_at DESC, share_id DESC)")
+                conn.execute(
+                    "DELETE FROM lectures WHERE share_id = %s AND payload->'video'->>'youtube_id' = %s AND payload->'video'->>'title' = %s",
+                    ("HYXha-7tWVhUJF2mq0KRDcE2ZHNmaLcc", "abcdefghijk", "배포 확인용 샘플"),
+                )
             self._schema_ready = True
 
     def check_ready(self) -> None:
